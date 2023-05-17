@@ -1,5 +1,5 @@
 {
-  "extends": ["@rocketseat/eslint-config/node", "prettier"],
+  "extends": ["@rocketseat/eslint-config/node"],
   "plugins": ["prettier"],
   "rules": {
     "no-useless-constructor": "off",
