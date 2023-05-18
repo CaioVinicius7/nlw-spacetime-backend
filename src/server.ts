@@ -1,12 +1,9 @@
 import fastify from "fastify";
+import { memoriesRoutes } from "./routes/memories";
 
 const app = fastify();
 
-app.get("/hello", () => {
-  return {
-    message: "Hello, world!"
-  };
-});
+app.register(memoriesRoutes);
 
 app
   .listen({
