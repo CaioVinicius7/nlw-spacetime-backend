@@ -64,22 +64,42 @@ export async function memoriesRoutes(app: FastifyInstance) {
 
     const { userId } = paramsSchema.parse(request.params);
 
-    const memories = await prisma.memory.findMany({
+    const userAndPublicMemories = await prisma.user.findUnique({
       where: {
-        userId,
-        isPublic: true
+        id: userId
+      },
+      select: {
+        name: true,
+        avatarUrl: true,
+        memories: {
+          where: {
+            isPublic: true
+          }
+        }
       }
     });
 
-    return memories.map((memory) => {
-      return {
-        id: memory.id,
-        coverUrl: memory.coverUrl,
-        excerpt: memory.content.substring(0, 115).concat("..."),
-        date: memory.date,
-        createdAt: memory.createdAt
-      };
-    });
+    if (!userAndPublicMemories) {
+      return reply.status(404).send({
+        message: "A user with this id does not exist."
+      });
+    }
+
+    return {
+      user: {
+        name: userAndPublicMemories.name,
+        avatarUrl: userAndPublicMemories.avatarUrl
+      },
+      memories: userAndPublicMemories.memories.map((memory) => {
+        return {
+          id: memory.id,
+          coverUrl: memory.coverUrl,
+          excerpt: memory.content.substring(0, 115).concat("..."),
+          date: memory.date,
+          createdAt: memory.createdAt
+        };
+      })
+    };
   });
 
   app.post(
